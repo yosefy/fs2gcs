@@ -55,7 +55,6 @@ func WalkDir(dt, root string, c chan<- string) error {
 			for j := 0; j <= 4095; j++ {
 				a := fmt.Sprintf("/%02s/%03s", strconv.FormatInt(int64(i), 16), strconv.FormatInt(int64(j), 16))
 				c <- a
-				// fmt.Println(a)
 			}
 		}
 		close(c)
@@ -98,7 +97,7 @@ func WalkBucket(dt string, client *storage.Client, path string, c chan<- string)
 		}
 		close(c)
 		return nil
-	// for the rest of cases (not tdime)
+		// for the rest of cases (not tdime)
 	} else {
 		var paths []string
 		m1 := regexp.MustCompile("^gs://([^/]*)/(.*)$")
@@ -122,7 +121,7 @@ func WalkBucket(dt string, client *storage.Client, path string, c chan<- string)
 				fmt.Printf("Bucket(%q).Objects(): %v", bucket, err)
 			}
 			if !strings.HasSuffix(attrs.Name, "/") {
-				// first we put the paths in slice , putting stright to 
+				// first we put the paths in slice , putting stright to
 				// channel doesn't work good
 				fmt.Println("now walking: ", i, " ", strings.TrimPrefix(attrs.Name, prefix+"/"))
 				paths = append(paths, strings.TrimPrefix(attrs.Name, prefix))
@@ -136,7 +135,6 @@ func WalkBucket(dt string, client *storage.Client, path string, c chan<- string)
 		return nil
 	}
 }
-
 
 func getBucketName(path string) string {
 	m1 := regexp.MustCompile("^gs://([^/]*)/(.*)$")
@@ -171,6 +169,7 @@ func download(conc int, srcPath, dstPath, cred string, paths <-chan string) erro
 
 				md := regexp.MustCompile("(.*)/.*")
 				toMkdir := md.ReplaceAllString(dstPath+v, "$1")
+				fmt.Println("dstPath: ", dstPath, "   v: ", v)
 				//fmt.Printf("%d will download: %q  to %q\n", a, fullSrcPath+v, toMkdir)
 
 				err := os.MkdirAll(toMkdir, os.ModePerm)
@@ -256,7 +255,6 @@ func upload(conc int, bucket, srcPath, dstPath, cred string, paths <-chan string
 	return nil
 }
 
-
 func main() {
 	paths := make(chan string)
 	var err error
@@ -267,6 +265,7 @@ func main() {
 		fconc = flag.Int("conc", 2, "upload cuncurrency")
 		fdt   = flag.String("data", "", "tdime in case of tdime")
 	)
+
 	flag.Parse()
 	cred := *fcred
 	in := strings.TrimSuffix(*fin, "/")
@@ -274,6 +273,11 @@ func main() {
 	conc := *fconc
 	dt := *fdt
 
+	if in == "" || out == "" {
+		fmt.Printf("\nplease provide both 'in' and 'out' parameters\n")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
 	fmt.Printf("---------------------------------------------\n")
 	fmt.Printf("credential: %s\t\t\n", cred)
 	fmt.Printf("input:      %s\t\t\n", in)
