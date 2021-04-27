@@ -4,7 +4,7 @@
 for regular uploads/downloads don't provide "data" flag (only for tdime for now)
 
 usage
-```
+```console
 ./fs2gcs  -in /dir1/dir2/ -out gs://BUCKET/obj1/obj2/ -conc 128
 ```
 
